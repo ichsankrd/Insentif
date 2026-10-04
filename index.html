@@ -64,7 +64,11 @@ table{width:100%;border-collapse:collapse;margin-top:8px}th,td{padding:6px 4px;f
 <script>
 const $=i=>document.getElementById(i),R=n=>"Rp"+Math.round(n).toLocaleString("id-ID"),L=n=>(+n||0).toLocaleString("id-ID"),N=i=>Math.max(0,+$(i).value||0),T=2000;
 const S={g:k=>{try{return localStorage.getItem(k)||""}catch(e){return""}},s:(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}}};
-["url","sid"].forEach(k=>$(k).value=S.g("sppg_"+k));
+/* ISI SEKALI DI SINI agar semua HP/browser otomatis terhubung */
+const URL_PATEN="https://script.google.com/macros/s/AKfycbxJygAYOs6bZl7A009aw3Q48zywYUwvXC40NbKLLA-SdVcrqGGOK4HmhUFdnxhJurJE/exec";
+const ID_PATEN="NPAQD8KM";
+$("url").value=S.g("sppg_url")||URL_PATEN;
+$("sid").value=S.g("sppg_sid")||ID_PATEN;
 const iso=d=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
 $("bln").value=iso(new Date()).slice(0,7);
 let manual=false;
