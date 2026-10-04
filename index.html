@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="id"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hitung Insentif SPPG</title>
+<style>
+:root{--bg:#f4f7f5;--card:#fff;--tx:#0f2a1f;--mut:#5d6f66;--g:#2f7d4f;--gd:#0b3321;--bd:#dbe5df;--bad:#c2410c;--badbg:#fff1e8}
+@media (prefers-color-scheme:dark){:root{--bg:#0c1712;--card:#14241c;--tx:#e6f1ea;--mut:#9bb0a4;--g:#4cb37a;--gd:#06180f;--bd:#274035;--bad:#fb923c;--badbg:#2b1b10}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.w{max-width:520px;margin:0 auto;padding:16px}h1{font-size:22px;margin:6px 0 14px;text-align:center}
+.c{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:16px;margin-bottom:14px}
+.n{display:inline-flex;width:26px;height:26px;border-radius:50%;background:var(--g);color:#fff;align-items:center;justify-content:center;font-weight:700;font-size:14px;margin-right:8px}
+h2{font-size:16px;margin:0 0 12px;display:flex;align-items:center}
+label{display:block;font-size:14px;margin-bottom:12px}label small{display:block;color:var(--mut);font-size:12px}
+input[type=number],input[type=date],input[type=text],input[type=month]{width:100%;padding:12px;margin-top:4px;border:1px solid var(--bd);border-radius:10px;background:var(--bg);color:var(--tx);font:inherit;font-size:18px}
+.k{display:flex;align-items:center;gap:10px;padding:8px 0;font-size:15px}.k input{width:22px;height:22px;margin:0;flex:none}
+.sub{font-size:12px;color:var(--mut);margin:10px 0 2px;text-transform:uppercase;letter-spacing:.04em}
+.res{background:var(--gd);color:#fff;border-radius:14px;padding:20px;text-align:center;margin-bottom:14px}
+.res .big{font-size:36px;font-weight:700;margin:4px 0}.res small{opacity:.85;font-size:14px}
+.warn{background:var(--badbg);color:var(--bad);border-radius:10px;padding:10px;font-size:14px;margin-top:10px}
+button{width:100%;padding:14px;border:0;border-radius:12px;background:var(--g);color:#fff;font:inherit;font-weight:700;cursor:pointer;margin-top:4px}
+button.o{background:transparent;color:var(--g);border:1px solid var(--g)}button:disabled{opacity:.5}
+details summary{cursor:pointer;font-weight:600}details{margin-bottom:14px}
+.f{font-size:13px;color:var(--mut)}#sm{text-align:center;font-size:14px;margin-top:8px;min-height:20px}
+table{width:100%;border-collapse:collapse;margin-top:8px}th,td{padding:6px 4px;font-size:14px;text-align:right;border-bottom:1px solid var(--bd)}th:first-child,td:first-child{text-align:left}
+</style></head><body><div class="w">
+<h1>Hitung Insentif SPPG</h1>
+
+<div class="c"><h2><span class="n">1</span>Tanggal pelayanan (otomatis)</h2>
+<div id="tt" style="font-size:20px;font-weight:700"></div>
+<a href="#" id="ub" style="font-size:13px;color:var(--g)">Ubah tanggal (jika mengisi hari lain)</a>
+<input type="date" id="tgl" hidden></div>
+
+<div class="c"><h2><span class="n">2</span>Isi jumlah porsi</h2>
+<label>Porsi yang diterima (data Fleet)<small>Porsi yang benar-benar diterima PIC penerima manfaat</small><input type="number" inputmode="numeric" min="0" id="dit" placeholder="contoh: 2333"></label>
+<label>Porsi sampel makanan<input type="number" inputmode="numeric" min="0" id="smp" placeholder="contoh: 3"></label>
+<label>Porsi uji organoleptik<input type="number" inputmode="numeric" min="0" id="uji" placeholder="contoh: 3"></label></div>
+
+<div class="c"><h2><span class="n">3</span>Kondisi hari ini</h2>
+<div class="sub">Centang jika benar</div>
+<div class="k"><input type="checkbox" id="c1" checked><label for="c1" style="margin:0">Hari ini hari pelayanan efektif (HPE)</label></div>
+<div class="k"><input type="checkbox" id="c5" checked><label for="c5" style="margin:0">Verifikasi mutu memenuhi</label></div>
+<div class="k"><input type="checkbox" id="c6" checked><label for="c6" style="margin:0">Data, BNBA, dan BAST sudah lengkap di SIPGN</label></div>
+<div class="sub">Centang jika terjadi</div>
+<div class="k"><input type="checkbox" id="c2"><label for="c2" style="margin:0">Gagal penyaluran karena kontaminasi</label></div>
+<div class="k"><input type="checkbox" id="c3"><label for="c3" style="margin:0">Ada keracunan</label></div>
+<div class="k"><input type="checkbox" id="c4"><label for="c4" style="margin:0">SPPG sedang di-suspend</label></div></div>
+
+<div class="res"><small>Insentif hari ini</small><div class="big" id="rI">Rp0</div><small id="rD"></small><div id="rW"></div></div>
+
+<button id="sv">Simpan ke Google Sheets</button><div id="sm"></div>
+
+<details class="c"><summary>Pengaturan Google Sheets</summary>
+<p class="f">Isi sekali saja. Cara pasang ada di file Code.gs.</p>
+<label>URL Apps Script (/exec)<input type="text" id="url" style="font-size:14px"></label>
+<label>ID SPPG<input type="text" id="sid" style="font-size:16px"></label>
+<button class="o" id="bs">Simpan pengaturan</button></details>
+
+<details class="c" id="rk"><summary>Riwayat bulan ini</summary>
+<label style="margin-top:10px">Bulan<input type="month" id="bln" style="font-size:16px"></label>
+<button class="o" id="rl">Tampilkan riwayat</button>
+<table><thead><tr><th>Tanggal</th><th>PM</th><th>Insentif</th></tr></thead><tbody id="hb"></tbody>
+<tfoot><tr><th>Total</th><th id="fp">0</th><th id="fi">Rp0</th></tr></tfoot></table></details>
+</div>
+<script>
+const $=i=>document.getElementById(i),R=n=>"Rp"+Math.round(n).toLocaleString("id-ID"),L=n=>(+n||0).toLocaleString("id-ID"),N=i=>Math.max(0,+$(i).value||0),T=2000;
+const S={g:k=>{try{return localStorage.getItem(k)||""}catch(e){return""}},s:(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}}};
+["url","sid"].forEach(k=>$(k).value=S.g("sppg_"+k));
+const iso=d=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+$("bln").value=iso(new Date()).slice(0,7);
+let manual=false;
+function setTgl(){
+ if(!manual)$("tgl").value=iso(new Date());
+ const p=$("tgl").value.split("-"),d=new Date(+p[0],+p[1]-1,+p[2]);
+ $("tt").textContent=d.toLocaleDateString("id-ID",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
+}
+$("ub").onclick=e=>{e.preventDefault();manual=true;$("tgl").hidden=false;$("ub").hidden=true};
+$("tgl").addEventListener("input",()=>{manual=true;setTgl()});
+setTgl();setInterval(setTgl,60000);
+document.addEventListener("visibilitychange",setTgl);
+window.addEventListener("focus",setTgl);
+function calc(){
+ const dit=N("dit"),smp=N("smp"),uji=N("uji"),pm=dit+smp+uji;
+ const ok=$("c1").checked&&$("c5").checked&&$("c6").checked&&!$("c2").checked&&!$("c3").checked&&!$("c4").checked;
+ const v=ok?pm*T:0;
+ $("rI").textContent=R(v);
+ $("rD").textContent=`${L(dit)} + ${L(smp)} + ${L(uji)} = ${L(pm)} PM × Rp2.000`;
+ $("rW").innerHTML=ok?"":'<div class="warn">Insentif hari ini Rp0 karena ada syarat yang tidak terpenuhi.</div>';
+ return{pm,v};
+}
+document.querySelectorAll("input").forEach(e=>e.addEventListener("input",calc));
+async function api(body){
+ const u=$("url").value.trim();if(!u)throw new Error("URL Google Sheets belum diisi");
+ const r=body?await fetch(u,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(body)}):await fetch(u);
+ const j=await r.json();if(!j.ok)throw new Error(j.error||"Gagal");return j;
+}
+function msg(t,bad){$("sm").textContent=t;$("sm").style.color=bad?"var(--bad)":"var(--g)"}
+$("bs").onclick=()=>{["url","sid"].forEach(k=>S.s("sppg_"+k,$(k).value.trim()));msg("Pengaturan tersimpan")};
+$("sv").onclick=async()=>{
+ const sid=$("sid").value.trim();
+ if(!sid){msg("Isi ID SPPG di Pengaturan dulu",1);return}
+ const c=calc(),b=x=>$(x).checked?1:0;
+ const d={Tanggal:$("tgl").value,IDSPPG:sid,NamaSPPG:"",Dimasak:"",Buffer:"",TidakTerkirim:"",Sampel:N("smp"),Uji:N("uji"),Diterima:N("dit"),TidakDiterima:"",HPE:b("c1"),Kontaminasi:b("c2"),Fatal:b("c3"),Suspend:b("c4"),MutuOK:b("c5"),DataLengkap:b("c6"),PMDihitung:c.pm,Insentif:c.v};
+ $("sv").disabled=true;msg("Menyimpan…");
+ try{await api(d);msg("Berhasil disimpan")}catch(e){msg("Gagal: "+e.message,1)}
+ $("sv").disabled=false;
+};
+$("rl").onclick=async()=>{
+ try{
+  const j=await api(),sid=$("sid").value.trim(),bl=$("bln").value;
+  const rows=j.rows.filter(r=>(!sid||String(r.IDSPPG)==sid)&&String(r.Tanggal).startsWith(bl)).sort((a,b)=>String(a.Tanggal)<String(b.Tanggal)?-1:1);
+  let tp=0,ti=0;
+  $("hb").innerHTML=rows.map(r=>{tp+=+r.Insentif>0?+r.PMDihitung:0;ti+=+r.Insentif||0;return`<tr><td>${r.Tanggal}</td><td>${L(r.PMDihitung)}</td><td>${R(r.Insentif)}</td></tr>`}).join("")||'<tr><td colspan="3" style="text-align:center">Belum ada data</td></tr>';
+  $("fp").textContent=L(tp);$("fi").textContent=R(ti);
+ }catch(e){msg("Gagal: "+e.message,1)}
+};
+calc();
+</script></body></html>
