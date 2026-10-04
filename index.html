@@ -107,9 +107,12 @@ $("sv").onclick=async()=>{
 $("rl").onclick=async()=>{
  try{
   const j=await api(),sid=$("sid").value.trim(),bl=$("bln").value;
-  const rows=j.rows.filter(r=>(!sid||String(r.IDSPPG)==sid)&&String(r.Tanggal).startsWith(bl)).sort((a,b)=>String(a.Tanggal)<String(b.Tanggal)?-1:1);
+  const nd=v=>{const s=String(v);if(/^\d{4}-\d{2}-\d{2}$/.test(s))return s;const d=new Date(v);return isNaN(d)?s:iso(d)};
+  const tg=s=>{const p=s.split("-");return p.length==3?new Date(+p[0],+p[1]-1,+p[2]).toLocaleDateString("id-ID",{day:"numeric",month:"long",year:"numeric"}):s};
+  j.rows.forEach(r=>r.Tanggal=nd(r.Tanggal));
+  const rows=j.rows.filter(r=>(!sid||String(r.IDSPPG)==sid)&&r.Tanggal.startsWith(bl)).sort((a,b)=>a.Tanggal<b.Tanggal?-1:1);
   let tp=0,ti=0;
-  $("hb").innerHTML=rows.map(r=>{tp+=+r.Insentif>0?+r.PMDihitung:0;ti+=+r.Insentif||0;return`<tr><td>${r.Tanggal}</td><td>${L(r.PMDihitung)}</td><td>${R(r.Insentif)}</td></tr>`}).join("")||'<tr><td colspan="3" style="text-align:center">Belum ada data</td></tr>';
+  $("hb").innerHTML=rows.map(r=>{tp+=+r.Insentif>0?+r.PMDihitung:0;ti+=+r.Insentif||0;return`<tr><td>${tg(r.Tanggal)}</td><td>${L(r.PMDihitung)}</td><td>${R(r.Insentif)}</td></tr>`}).join("")||'<tr><td colspan="3" style="text-align:center">Belum ada data</td></tr>';
   $("fp").textContent=L(tp);$("fi").textContent=R(ti);
  }catch(e){msg("Gagal: "+e.message,1)}
 };
